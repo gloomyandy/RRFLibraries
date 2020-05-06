@@ -31,7 +31,7 @@ typedef Task_undefined *TaskHandle;
   This function enables IRQ interrupts by clearing the I-bit in the CPSR.
   Can only be executed in Privileged modes.
  */
-__attribute__( ( always_inline ) ) static inline void EnableInterrupts()
+__attribute__( ( always_inline ) ) static inline void EnableInterrupts() noexcept
 {
   __asm volatile ("cpsie i" : : : "memory");
 }
@@ -42,7 +42,7 @@ __attribute__( ( always_inline ) ) static inline void EnableInterrupts()
   This function disables IRQ interrupts by setting the I-bit in the CPSR.
   Can only be executed in Privileged modes.
  */
-__attribute__( ( always_inline ) ) static inline void DisableInterrupts()
+__attribute__( ( always_inline ) ) static inline void DisableInterrupts() noexcept
 {
   __asm volatile ("cpsid i" : : : "memory");
 }
@@ -50,7 +50,7 @@ __attribute__( ( always_inline ) ) static inline void DisableInterrupts()
 class Mutex
 {
 public:
-	Mutex() : handle(nullptr)
+	Mutex() noexcept : handle(nullptr)
 #ifdef RTOS
 		, next(nullptr), name(nullptr)
 #endif
@@ -62,8 +62,8 @@ public:
 	TaskHandle GetHolder() const noexcept;
 
 #ifdef RTOS
-	const Mutex *GetNext() const { return next; }
-	const char *GetName() const { return name; }
+	const Mutex *GetNext() const noexcept { return next; }
+	const char *GetName() const noexcept { return name; }
 #endif
 
 	Mutex(const Mutex&) = delete;
@@ -72,7 +72,7 @@ public:
 	static constexpr uint32_t TimeoutUnlimited = 0xFFFFFFFF;
 
 #ifdef RTOS
-	static const Mutex *GetMutexList() { return mutexList; }
+	static const Mutex *GetMutexList() noexcept { return mutexList; }
 #endif
 
 private:

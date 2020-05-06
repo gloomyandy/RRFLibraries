@@ -8,7 +8,7 @@
 #include "Deviation.h"
 #include <cmath>
 
-Deviation::Deviation() noexcept: mean(0.0), deviationFromMean(0.0)
+Deviation::Deviation() noexcept : mean(0.0), deviationFromMean(0.0)
 {
 }
 
