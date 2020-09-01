@@ -32,10 +32,14 @@
 #define STRINGLIST_14(_v1,_v2,_v3,_v4,_v5,_v6,_v7,_v8,_v9,_v10,_v11,_v12,_v13,_v14)				#_v1,#_v2,#_v3,#_v4,#_v5,#_v6,#_v7,#_v8,#_v9,#_v10,#_v11,#_v12,#_v13,#_v14
 #define STRINGLIST_15(_v1,_v2,_v3,_v4,_v5,_v6,_v7,_v8,_v9,_v10,_v11,_v12,_v13,_v14,_v15)		#_v1,#_v2,#_v3,#_v4,#_v5,#_v6,#_v7,#_v8,#_v9,#_v10,#_v11,#_v12,#_v13,#_v14,#_v15
 #define STRINGLIST_16(_v1,_v2,_v3,_v4,_v5,_v6,_v7,_v8,_v9,_v10,_v11,_v12,_v13,_v14,_v15,_v16)	#_v1,#_v2,#_v3,#_v4,#_v5,#_v6,#_v7,#_v8,#_v9,#_v10,#_v11,#_v12,#_v13,#_v14,#_v15,#_v16
-#define STRINGLIST_17(_v1,_v2,_v3,_v4,_v5,_v6,_v7,_v8,_v9,_v10,_v11,_v12,_v13,_v14,_v15,_v16, _v17)	#_v1,#_v2,#_v3,#_v4,#_v5,#_v6,#_v7,#_v8,#_v9,#_v10,#_v11,#_v12,#_v13,#_v14,#_v15,#_v16,#_v17
-#define STRINGLIST_18(_v1,_v2,_v3,_v4,_v5,_v6,_v7,_v8,_v9,_v10,_v11,_v12,_v13,_v14,_v15,_v16, _v17, _v18)	#_v1,#_v2,#_v3,#_v4,#_v5,#_v6,#_v7,#_v8,#_v9,#_v10,#_v11,#_v12,#_v13,#_v14,#_v15,#_v16,#_v17,#_v18
-#define STRINGLIST_19(_v1,_v2,_v3,_v4,_v5,_v6,_v7,_v8,_v9,_v10,_v11,_v12,_v13,_v14,_v15,_v16, _v17, _v18, _v19)	#_v1,#_v2,#_v3,#_v4,#_v5,#_v6,#_v7,#_v8,#_v9,#_v10,#_v11,#_v12,#_v13,#_v14,#_v15,#_v16,#_v17,#_v18,#_v19
-#define STRINGLIST_20(_v1,_v2,_v3,_v4,_v5,_v6,_v7,_v8,_v9,_v10,_v11,_v12,_v13,_v14,_v15,_v16, _v17, _v18, _v19, _v20)	#_v1,#_v2,#_v3,#_v4,#_v5,#_v6,#_v7,#_v8,#_v9,#_v10,#_v11,#_v12,#_v13,#_v14,#_v15,#_v16,#_v17,#_v18,#_v19,#_v20
+#define STRINGLIST_17(_v1,_v2,_v3,_v4,_v5,_v6,_v7,_v8,_v9,_v10,_v11,_v12,_v13,_v14,_v15,_v16,_v17) \
+	#_v1,#_v2,#_v3,#_v4,#_v5,#_v6,#_v7,#_v8,#_v9,#_v10,#_v11,#_v12,#_v13,#_v14,#_v15,#_v16,#_v17
+#define STRINGLIST_18(_v1,_v2,_v3,_v4,_v5,_v6,_v7,_v8,_v9,_v10,_v11,_v12,_v13,_v14,_v15,_v16,_v17,_v18) \
+	#_v1,#_v2,#_v3,#_v4,#_v5,#_v6,#_v7,#_v8,#_v9,#_v10,#_v11,#_v12,#_v13,#_v14,#_v15,#_v16,#_v17,#_v18
+#define STRINGLIST_19(_v1,_v2,_v3,_v4,_v5,_v6,_v7,_v8,_v9,_v10,_v11,_v12,_v13,_v14,_v15,_v16,_v17,_v18,_v19) \
+	#_v1,#_v2,#_v3,#_v4,#_v5,#_v6,#_v7,#_v8,#_v9,#_v10,#_v11,#_v12,#_v13,#_v14,#_v15,#_v16,#_v17,#_v18,#_v19
+#define STRINGLIST_20(_v1,_v2,_v3,_v4,_v5,_v6,_v7,_v8,_v9,_v10,_v11,_v12,_v13,_v14,_v15,_v16,_v17,_v18,_v19,_v20) \
+	#_v1,#_v2,#_v3,#_v4,#_v5,#_v6,#_v7,#_v8,#_v9,#_v10,#_v11,#_v12,#_v13,#_v14,#_v15,#_v16,#_v17,#_v18,#_v19,#_v20
 
 // Function to search the table of names for a match. Returns numNames if not found.
 unsigned int NamedEnumLookup(const char *s, const char * const names[], unsigned int numNames) noexcept;
