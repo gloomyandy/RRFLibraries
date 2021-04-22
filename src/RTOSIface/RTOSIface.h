@@ -148,6 +148,8 @@ public:
 	void Suspend() noexcept { vTaskSuspend(GetFreeRTOSHandle()); }
 	void Resume() noexcept { vTaskResume(GetFreeRTOSHandle()); }
 
+	bool IsRunning() const noexcept { return taskId != 0; }
+
 	// Wake up a task identified by its handle from an ISR. Safe to call with a null handle.
 	static void GiveFromISR(TaskBase *h) noexcept
 	{
@@ -158,15 +160,7 @@ public:
 	}
 
 	// Wake up this task from an ISR
-	void GiveFromISR() noexcept
-	{
-		if (taskId != 0)			// check that the task has been created and not terminated
-		{
-			BaseType_t higherPriorityTaskWoken = pdFALSE;
-			vTaskNotifyGiveFromISR(GetFreeRTOSHandle(), &higherPriorityTaskWoken);
-			portYIELD_FROM_ISR(higherPriorityTaskWoken);
-		}
-	}
+	void GiveFromISR() noexcept;
 
 	// Wake up this task but not from an ISR
 	void Give() noexcept
@@ -447,6 +441,24 @@ public:
 
 private:
 	ReadLocker locker;
+	T* ptr;
+};
+
+template<class T> class WriteLockedPointer
+{
+public:
+	WriteLockedPointer(WriteLocker& p_locker, T* p_ptr) noexcept : locker(std::move(p_locker)), ptr(p_ptr) { }
+	WriteLockedPointer(std::nullptr_t, T* p_ptr) noexcept : locker(nullptr), ptr(p_ptr) { }
+	WriteLockedPointer(const WriteLockedPointer&) = delete;
+	WriteLockedPointer(WriteLockedPointer&& other) noexcept : locker(std::move(other.locker)), ptr(other.ptr) { other.ptr = nullptr; }
+
+	bool IsNull() const noexcept { return ptr == nullptr; }
+	bool IsNotNull() const noexcept { return ptr != nullptr; }
+	T* operator->() const noexcept { return ptr; }
+	T* Ptr() const noexcept { return ptr; }
+
+private:
+	WriteLocker locker;
 	T* ptr;
 };
 
