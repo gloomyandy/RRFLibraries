@@ -162,7 +162,7 @@ uint32_t isqrt64(uint64_t num) noexcept
 
 #if !((defined(__FPU_USED) && __FPU_USED) || (defined (__VFP_FP__) && !defined(__SOFTFP__)))
 
-// This is a fast floating point square root function for processor that don't have a FPU.
+// This is a fast floating point square root function for processors that don't have a FPU.
 // It doesn't handle negative, infinite, NaN or denormalised operands correctly. For normal operands it usually returns exactly the same result as calling sqrtf().
 // On the SAM4S it takes 1.69us compared to 3.25us for sqrtf. On the SAMC21 it takes 4.02us compared to 8.28us for sqrtf.
 float fastSqrtf(float f) noexcept
@@ -193,7 +193,6 @@ float fastSqrtf(float f) noexcept
 	int32_t exponent = (int32_t)uexponent - 127;
 
 	// 5. Make the exponent even, also shift it left to get more result bits. This puts fraction in the range 2^30 to 2^32 - 2^8 + 1.
-	//    Fill the extra bits with 1s because this gives us a more accurate result.
 	fraction <<= 7 + (exponent & 1);
 
 	// 6. Halve the exponent, which also gets rid of the odd bit if it is present. Shift right is arithmetic in gcc, so the sign is preserved.
