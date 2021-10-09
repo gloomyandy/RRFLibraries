@@ -23,6 +23,7 @@
 # include "FreeRTOS.h"
 # include "task.h"
 # include "semphr.h"
+# include "freertos_task_additions.h"
 # include <atomic>
 
 #endif
@@ -148,6 +149,7 @@ public:
 	void Suspend() noexcept { vTaskSuspend(GetFreeRTOSHandle()); }
 	void Resume() noexcept { vTaskResume(GetFreeRTOSHandle()); }
 
+	void SetPriority(unsigned int priority) noexcept { vTaskPrioritySet(GetFreeRTOSHandle(), priority); }
 	bool IsRunning() const noexcept { return taskId != 0; }
 
 	// Wake up a task identified by its handle from an ISR. Safe to call with a null handle.
@@ -189,6 +191,8 @@ public:
 	TaskBase& operator=(const TaskBase&) = delete;	// it's not safe to assign these
 
 	static TaskBase *GetTaskList() noexcept { return taskList; }
+
+	static const uint32_t *GetCurrentTaskStackBase() noexcept { return pxTaskGetCurrentStackBase(); }
 
 	static constexpr uint32_t TimeoutUnlimited = 0xFFFFFFFF;
 
