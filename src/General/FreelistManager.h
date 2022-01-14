@@ -39,7 +39,7 @@ namespace FreelistManager
 		if (freelist != nullptr)
 		{
 			void * const p = freelist;
-			freelist = *static_cast<void **>(p);
+			freelist = *reinterpret_cast<void **>(p);
 			return p;
 		}
 		return ::operator new(Sz);
@@ -51,7 +51,7 @@ namespace FreelistManager
 		TaskCriticalSectionLocker lock;
 #endif
 
-		*static_cast<void **>(p) = freelist;
+		*reinterpret_cast<void **>(p) = freelist;
 		freelist = p;
 	}
 
@@ -74,5 +74,10 @@ namespace FreelistManager
 		Freelist<RoundedUpSize(sizeof(T))>::ReleaseItem(p);
 	}
 }
+
+// Call this macro within a class public section to use freelist new and delete
+#define DECLARE_FREELIST_NEW_DELETE(_Type) \
+void* operator new(size_t sz) noexcept { return FreelistManager::Allocate<_Type>(); } \
+void operator delete(void* p) noexcept { FreelistManager::Release<_Type>(p); }
 
 #endif /* SRC_LIBRARIES_GENERAL_FREELISTMANAGER_H_ */
