@@ -13,6 +13,7 @@
 #include <climits>
 #include "function_ref.h"
 #include "gcc_builtins.h"
+#include "ecv_duet3d.h"
 
 // Helper functions to work on bitmaps of various lengths.
 // The primary purpose of these is to allow us to switch between 16, 32 and 64-bit bitmaps.
@@ -59,6 +60,24 @@ template<class T> inline constexpr T ExtractBit(T val, unsigned int fromBitNumbe
 	else
 	{
 		return (val >> (fromBitNumber - toBitNumber)) & ((T)1 << toBitNumber);
+	}
+}
+
+// Extract two bits from a value and move it to a target bit number, returning a value with only the target bits possibly set
+// T should be an unsigned integer type
+template<class T> inline constexpr T ExtractTwoBits(T val, unsigned int fromBitNumber, unsigned int toBitNumber) noexcept
+{
+	if (fromBitNumber == toBitNumber)
+	{
+		return val & ((T)3 << toBitNumber);
+	}
+	else if (toBitNumber > fromBitNumber)
+	{
+		return (val << (toBitNumber - fromBitNumber)) & ((T)3 << toBitNumber);
+	}
+	else
+	{
+		return (val >> (fromBitNumber - toBitNumber)) & ((T)3 << toBitNumber);
 	}
 }
 
@@ -316,6 +335,8 @@ template<class BaseType> Bitmap<BaseType> Bitmap<BaseType>::MakeFromArray(const 
 template<unsigned int N> class LargeBitmap
 {
 public:
+	LargeBitmap() noexcept { ClearAll(); }
+
 	void ClearAll() noexcept;
 
 	void SetBit(unsigned int n) noexcept
