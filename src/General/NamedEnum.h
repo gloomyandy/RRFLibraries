@@ -101,6 +101,7 @@ public: \
 	typedef _baseType BaseType;																					/* alias for the base type */ \
 	enum RawType : BaseType { _v1 = 0, __VA_ARGS__ };															/* underlying enumeration */ \
 	static constexpr unsigned int NumValues = VA_SIZE(__VA_ARGS__) + 1;											/* count of members */ \
+	_typename() noexcept { v = _v1; } 																			/* add default constructor */\
 	_typename(RawType arg) noexcept { v = arg; }																/* constructor - cannot be declared 'explicit' because we need the conversion */ \
 	explicit _typename(BaseType arg) noexcept { v = static_cast<RawType>(arg); }								/* constructor */ \
 	explicit _typename(const char * _ecv_array s) noexcept { v = static_cast<RawType>(NamedEnumLookup(s, _names, NumValues)); }	/* constructor from string */ \
