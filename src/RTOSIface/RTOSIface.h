@@ -52,7 +52,7 @@ __attribute__((always_inline)) static inline void DisableInterrupts() noexcept
 	__asm volatile ("cpsid i" : : : "memory");
 }
 
-// Mutex class. This uses the FreeRTOS static semaphore type, but adds a name and links them all together in a list
+// Recursive mutex class. This uses the FreeRTOS static semaphore type, but adds a name and links them all together in a list
 class Mutex final
 #ifdef RTOS
 	: public StaticSemaphore_t
@@ -151,6 +151,7 @@ public:
 
 	void SetPriority(unsigned int priority) noexcept { vTaskPrioritySet(GetFreeRTOSHandle(), priority); }
 
+	static unsigned int GetCurrentTaskPriority() noexcept { return uxTaskPriorityGet(nullptr); }
 	static void SetCurrentTaskPriority(unsigned int priority) noexcept { vTaskPrioritySet(nullptr, priority); }
 
 	bool IsRunning() const noexcept { return taskId != 0; }
@@ -176,19 +177,19 @@ public:
 	// Wait until we have been woken up or we time out. Return true if successful, false if we timed out (same as for Mutex::Take()).
 	static bool TakeIndexed(uint32_t index, uint32_t timeout = TimeoutUnlimited) noexcept
 	{
-		return ulTaskGenericNotifyTake(index, pdTRUE, timeout) != 0;
+		return ulTaskNotifyTakeIndexed(index, pdTRUE, timeout) != 0;
 	}
 
 	// Clear a task notification count
 	static uint32_t ClearNotifyCount(TaskBase *_ecv_from h, uint32_t index) noexcept
 	{
-		return xTaskGenericNotifyStateClear(h->GetFreeRTOSHandle(), index);
+		return xTaskNotifyStateClearIndexed(h->GetFreeRTOSHandle(), index);
 	}
 
 	// Clear the current task notification count
 	static uint32_t ClearCurrentTaskNotifyCount(uint32_t index) noexcept
 	{
-		return xTaskGenericNotifyStateClear(nullptr, index);
+		return xTaskNotifyStateClearIndexed(nullptr, index);
 	}
 
 	static TaskBase *_ecv_from GetCallerTaskHandle() noexcept { return reinterpret_cast<TaskBase *>(xTaskGetCurrentTaskHandle()); }
