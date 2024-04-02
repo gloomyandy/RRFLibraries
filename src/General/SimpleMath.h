@@ -118,6 +118,17 @@ inline float fastSqrtf(float f) noexcept
 	return ret;
 }
 
+#elif defined(__RP2040__)
+// On the RP2040 we use the ROM based floating point code
+inline float fastSqrtf(float f) noexcept
+{
+	if (f <= 0.0f)
+	{
+		return 0.0f;
+	}
+	return sqrtf(f);
+}
+
 #else
 
 // This function is defined in Math/Isqrt.cpp or in Qfplib but declared here for convenience
