@@ -553,13 +553,18 @@ int FormattedPrinter::Print(c_string format, va_list args) noexcept
 {
 	for (;;)
 	{
-		char ch;
-		while ((ch = *format++) != '%')
+		char ch = *format++;
+		if (ch == 0)
+		{
+			break;
+		}
+		if (ch != '%')
 		{
 			if (!PutChar(ch))
 			{
-				return curLen;
+				break;
 			}
+			continue;
 		}
 
 		// If we get here then ch == '%'. Get the next character.
@@ -572,7 +577,7 @@ int FormattedPrinter::Print(c_string format, va_list args) noexcept
 		{
 			if (!PutChar(ch))
 			{
-				return curLen;
+				break;
 			}
 			continue;
 		}
@@ -682,7 +687,7 @@ int FormattedPrinter::Print(c_string format, va_list args) noexcept
 			{
 				if (!PutChar(c2))
 				{
-					return curLen;
+					break;
 				}
 			}
 
@@ -751,7 +756,8 @@ int FormattedPrinter::Print(c_string format, va_list args) noexcept
 			continue;
 		}
 	}
-	PutChar('\0');
+
+	(void)PutChar('\0');
 	return curLen;
 }
 
