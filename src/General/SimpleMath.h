@@ -130,7 +130,7 @@ inline double fastSqrtd(double d) noexcept
 }
 # endif
 
-#elif defined(__RP2040__)
+#elif defined(__RP2040__) || defined(__RP2350__)
 // On the RP2040 we use the ROM based floating point code
 inline float fastSqrtf(float f) noexcept
 {
