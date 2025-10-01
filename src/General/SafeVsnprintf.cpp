@@ -254,7 +254,7 @@ bool FormattedPrinter::PutJson(c_string apString) noexcept
 	return false;
 }
 
-// Output the string representation of the number to be printed, with a sign uf necessary, padded as required
+// Output the string representation of the number to be printed, with a sign if necessary, padded as required
 // 's' is the string representation of the number to be printed, with space for a sign to be added at the front
 bool FormattedPrinter::PutStringWithSign(char *_ecv_array s, bool isNegative) noexcept
 {
@@ -322,8 +322,9 @@ bool FormattedPrinter::PrintLL(long long i) noexcept
 	}
 
 	char print_buf[MaxUllDigits + 2];
+	memset(print_buf, 0, sizeof(print_buf));									// to help with stack overflow detection
 	char *_ecv_array s = print_buf + sizeof print_buf - 1;
-	*s = '\0';
+	//*s = '\0';																// reinstate this if we remove the above memset call
 	while (u != 0)
 	{
 		unsigned int t = u % (unsigned int)flags.base;
@@ -364,8 +365,9 @@ bool FormattedPrinter::PrintI(int i) noexcept
 	}
 
 	char print_buf[MaxLongDigits + 2];
+	memset(print_buf, 0, sizeof(print_buf));									// to help with stack overflow detection
 	char *_ecv_array s = print_buf + sizeof print_buf - 1;
-	*s = '\0';
+	//*s = '\0';																// reinstate this if we remove the above memset call
 
 	switch (base)
 	{
@@ -426,7 +428,7 @@ bool FormattedPrinter::PrintFloat(double d, char formatLetter) noexcept
 	}
 	if (std::isinf(d))
 	{
-		return PutString((d > (double)0.0) ? "+inf" : "-inf");
+		return PutString((std::signbit(d)) ? "-inf" : "+inf");
 	}
 
 	double ud = fabs(d);
@@ -497,8 +499,9 @@ bool FormattedPrinter::PrintFloat(double d, char formatLetter) noexcept
 	}
 
 	char print_buf[MaxUllDigits + MaxLongDigits + 5];
+	memset(print_buf, 0, sizeof(print_buf));									// to help with stack overflow detection
 	char *_ecv_array s = print_buf + sizeof print_buf - 1;
-	*s = '\0';
+	//*s = '\0';																// reinstate this if we remove the above memset call
 
 	long long u = llrint(ud);
 
@@ -542,7 +545,7 @@ bool FormattedPrinter::PrintFloat(double d, char formatLetter) noexcept
 	}
 	while (u != 0 || digitsAfterPoint >= 0);
 
-	return PutStringWithSign(s, d < (double)0.0);
+	return PutStringWithSign(s, std::signbit(d));		// using std::signbit is quicker than comparing with 0.0 on Cortex M0 in particular
 }
 
 #endif
@@ -798,11 +801,11 @@ int SafeVsnprintf(char *_ecv_array buffer, size_t maxLen, c_string format, va_li
 	return ret;
 }
 
-int SafeSnprintf(char *_ecv_array buffer, size_t buf_size, c_string format, ...) noexcept
+int SafeSnprintf(char *_ecv_array buffer, size_t maxLen, c_string format, ...) noexcept
 {
 	va_list vargs;
 	va_start(vargs, format);
-	const int ret = SafeVsnprintf(buffer, buf_size, format, vargs);
+	const int ret = SafeVsnprintf(buffer, maxLen, format, vargs);
 	va_end(vargs);
 	return ret;
 }

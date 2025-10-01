@@ -55,7 +55,7 @@ float fastCubeRootf(float f) noexcept
 	const float nextCube = fcube(nextRet);
 	const float prevRet = std::nextafter(aret, 0.0);
 	const float prevCube = fcube(prevRet);
-	if (   ret * f < 0.0								// if the sign of the result is incorrect
+	if (   std::signbit(ret( != std::signbit(f))								// if the sign of the result is incorrect
 		|| nextCube < fabsf(f)
 		|| prevCube > fabsf(f)
 	   )
@@ -81,7 +81,7 @@ size_t SolveCubic(double a, double b, double c, double d, double *rslt) noexcept
 	if (a == (double)0.0)
 	{
 		// The equation is actually quadratic
-		const double discriminant = dsquare((double)c) - 4 * b * d;
+		const double discriminant = dsquare(c) - 4 * b * d;
 		if (discriminant == (double)0.0)
 		{
 			rslt[0] = -c/(2 * b);
@@ -95,6 +95,25 @@ size_t SolveCubic(double a, double b, double c, double d, double *rslt) noexcept
 			return 2;
 		}
 		return 0;
+	}
+	else if (d == (double)0.0)
+	{
+		// x=0 is a solution, which we can factor out
+		rslt[0] = (double)0.0;
+		const double discriminant = dsquare(b) - 4 * a * c;
+		if (discriminant == (double)0.0)
+		{
+			rslt[1] = -b/(2 * a);
+			return 2;
+		}
+		if (discriminant > (double)0.0)
+		{
+			const double s = fastSqrtd(discriminant);
+			rslt[1] = (s - b)/(2 * a);
+			rslt[2] = -(s + b)/(2 * a);
+			return 3;
+		}
+		return 1;
 	}
 	else
 	{
@@ -133,8 +152,14 @@ size_t SolveCubic(double a, double b, double c, double d, double *rslt) noexcept
 
 		if (minusDiscriminant > (double)0.0)
 		{
-			// One real root and two complex conjugate roots
-			const double bigC = fastCubeRootd((delta1 + fastSqrtd(minusDiscriminant)) * (double)0.5);
+			// One real root and two complex conjugate roots. We just want the real one.
+			const double mdsqrt = fastSqrtd(minusDiscriminant);
+			// In the following, in principle we can use either the positive or the negative square root.
+			// However if we choose the one that makes 'temp' in the following very small then we can get underflow,
+			// which results in bigC becoming zero or nearly zero, and rslt[0] becomes infinite.
+			// So we choose the sign of the square root to maximise abs(temp).
+			const double temp = (std::signbit(delta1)) ? delta1 - mdsqrt : delta1 + mdsqrt;
+			const double bigC = fastCubeRootd(temp * (double)0.5);
 			rslt[0] = -(b + bigC + delta0/bigC)/threeA;
 			return 1;
 		}
@@ -159,7 +184,7 @@ double SmallestNonNegativeCubicSolution(double a, double b, double c, double d) 
 	double rslt[3];
 	const size_t numSolutions = SolveCubic(a, b, c, d, rslt);
 #if 0
-	debugPrintf("%u solutions:", numSolutions);	//***TEMP!
+	debugPrintf("%u solutions:", numSolutions);
 	if (numSolutions >= 1) { debugPrintf(" %.3e", (double)rslt[0]); }
 	if (numSolutions >= 2) { debugPrintf(" %.3e", (double)rslt[1]); }
 	if (numSolutions >= 3) { debugPrintf(" %.3e", (double) rslt[2]); }
@@ -180,6 +205,14 @@ double SmallestNonNegativeCubicSolution(double a, double b, double c, double d) 
 		//[[fallthrough]]
 		// no break
 	default:
+#if 0
+		debugPrintf("No non-negative solution found: a=%.4g b=%.4g c=%.4g d=%.4g\n", a, b, c, d);
+		debugPrintf("%u solutions:", numSolutions);
+		if (numSolutions >= 1) { debugPrintf(" %.3e", (double)rslt[0]); }
+		if (numSolutions >= 2) { debugPrintf(" %.3e", (double)rslt[1]); }
+		if (numSolutions >= 3) { debugPrintf(" %.3e", (double) rslt[2]); }
+		debugPrintf("\n");
+#endif
 		return std::numeric_limits<double>::quiet_NaN();
 	}
 }
