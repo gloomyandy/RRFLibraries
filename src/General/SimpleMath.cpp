@@ -193,17 +193,14 @@ double SmallestNonNegativeCubicSolution(double a, double b, double c, double d) 
 	switch (numSolutions)
 	{
 	case 3:
-		if (rslt[2] >= (double)0.0 && (rslt[1] < (double)0.0 || rslt[2] < rslt[1]) && (rslt[0] < (double)0.0 || rslt[2] < rslt[0])) { return rslt[2]; }
-		//[[fallthrough]]
-		// no break
+		if (rslt[2] >= 0.0 && rslt[2] < rslt[1] && rslt[2] < rslt[0]) { return rslt[2]; }
+		[[fallthrough]];
 	case 2:
-		if (rslt[1] >= (double)0.0 && (rslt[0] < (double)0.0 || rslt[1] < rslt[0])) { return rslt[1]; }
-		//[[fallthrough]]
-		// no break
+		if (rslt[1] >= 0.0 && rslt[1] < rslt[0]) { return rslt[1]; }
+		[[fallthrough]];
 	case 1:
-		if (rslt[0] >= (double)0.0) { return rslt[0]; }
-		//[[fallthrough]]
-		// no break
+		if (rslt[0] >= 0.0) { return rslt[0]; }
+		[[fallthrough]];
 	default:
 #if 0
 		debugPrintf("No non-negative solution found: a=%.4g b=%.4g c=%.4g d=%.4g\n", a, b, c, d);
