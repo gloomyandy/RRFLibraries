@@ -11,19 +11,6 @@
 #include <type_traits>
 #include <utility>
 
-#ifdef __ECV__
-
-// eCv doesn't yet handle variadic templates or template specialisations, so use dummy definitions for now
-template<typename Fn> class function_ref
-{
-};
-
-template<typename Fn> class function_ref_noexcept
-{
-};
-
-#else
-
 // Version that may throw exceptions
 template<typename Fn> class function_ref;
 
@@ -34,24 +21,34 @@ class function_ref<RetType(Params...)>
 	void *callable;
 
 	template<typename Callable> static RetType callback_fn(void *callable2, Params ...params) noexcept(false)
+#ifdef __ECV__
+	;
+#else
 	{
 		return (*reinterpret_cast<Callable*>(callable2))(std::forward<Params>(params)...);
 	}
+#endif
 
 public:
+#ifndef __ECV__
 	template <typename Callable> function_ref(Callable &&callable2,
 				typename std::enable_if<!std::is_same<typename std::remove_reference<Callable>::type, function_ref>::value>::type * = nullptr) noexcept
 	   : callback(callback_fn<typename std::remove_reference<Callable>::type>),
 		 callable(reinterpret_cast<void *>(&callable2)) {}
 
 	/// Creates a function_ref which refers to the same callable as rhs
-    constexpr function_ref(const function_ref<RetType(Params...)> &rhs) noexcept = default;
+	constexpr function_ref(const function_ref<RetType(Params...)> &rhs) noexcept = default;
+#endif
 
     /// Call the stored callable with the given arguments
     RetType operator()(Params ...params) const noexcept(false)
+#ifdef __ECV__
+    ;
+#else
 	{
 		return callback(callable, std::forward<Params>(params)...);
 	}
+#endif
 };
 
 // Version that never throws exceptions
@@ -64,26 +61,34 @@ class function_ref_noexcept<RetType(Params...) noexcept>
 	void *callable;
 
 	template<typename Callable> static RetType callback_fn(void *callable2, Params ...params) noexcept
+#ifdef __ECV__
+	;
+#else
 	{
 		return (*reinterpret_cast<Callable*>(callable2))(std::forward<Params>(params)...);
 	}
+#endif
 
 public:
+#ifndef __ECV__
 	template <typename Callable> function_ref_noexcept(Callable &&callable2,
 				typename std::enable_if<!std::is_same<typename std::remove_reference<Callable>::type, function_ref_noexcept>::value>::type * = nullptr) noexcept
 	   : callback(callback_fn<typename std::remove_reference<Callable>::type>),
 		 callable(reinterpret_cast<void *>(&callable2)) {}
 
 	/// Creates a function_ref which refers to the same callable as rhs
-    constexpr function_ref_noexcept(const function_ref_noexcept<RetType(Params...) noexcept> &rhs) noexcept = default;
+	constexpr function_ref_noexcept(const function_ref_noexcept<RetType(Params...) noexcept> &rhs) noexcept = default;
+#endif
 
     /// Call the stored callable with the given arguments
     RetType operator()(Params ...params) const noexcept
+#ifdef __ECV__
+	;
+#else
 	{
 		return callback(callable, std::forward<Params>(params)...);
 	}
-};
-
 #endif
+};
 
 #endif /* GENERAL_FUNCTION_REF_H */
