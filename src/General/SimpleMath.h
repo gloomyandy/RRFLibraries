@@ -145,7 +145,7 @@ inline float fastSqrtf(float f) noexcept
 	}
 	return sqrtf(f);
 }
-# if (defined(SAME70) && SAME70) || defined(__SAME70Q21__)
+# if (defined(SAME70) && SAME70) || defined(__SAME70Q21__) || STM32H7
 // Built-in double precision square root function that just uses the ARM floating point instruction for best speed
 // This differs from __builtin_sqrt by not checking for a negative operand, which is supposed to set error codes
 inline double fastSqrtd(double d) noexcept
@@ -163,7 +163,7 @@ extern float fastSqrtf(float f) noexcept;
 
 #endif
 
-#if (defined(SAME70) && SAME70) || defined(__SAME70Q21__)
+#if (defined(SAME70) && SAME70) || defined(__SAME70Q21__) || STM32H7
 
 // Return the real cube root of a float. Twice as fast as calling cbrt() but possibly less accurate.
 float fastCubeRootf(float f) noexcept;
