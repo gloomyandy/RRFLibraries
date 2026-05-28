@@ -254,7 +254,7 @@ bool FormattedPrinter::PutJson(c_string apString) noexcept
 	return false;
 }
 
-// Output the string representation of the number to be printed, with a sign uf necessary, padded as required
+// Output the string representation of the number to be printed, with a sign if necessary, padded as required
 // 's' is the string representation of the number to be printed, with space for a sign to be added at the front
 bool FormattedPrinter::PutStringWithSign(char *_ecv_array s, bool isNegative) noexcept
 {
@@ -428,7 +428,7 @@ bool FormattedPrinter::PrintFloat(double d, char formatLetter) noexcept
 	}
 	if (std::isinf(d))
 	{
-		return PutString("inf");
+		return PutString((std::signbit(d)) ? "-inf" : "+inf");
 	}
 
 	double ud = fabs(d);
@@ -440,20 +440,20 @@ bool FormattedPrinter::PrintFloat(double d, char formatLetter) noexcept
 	int exponent = 0;
 	if (formatLetter == 'e' || formatLetter == 'E' || formatLetter == 'g' || formatLetter == 'G')
 	{
-		// Using exponent format, so calculate the exponent and normalise ud to be >=1.0 but <10.0
-		// The following loops are inefficient, however we don't expect to print very large or very small numbers
-		while (ud >= (double)100000.0)
-		{
-			ud /= (double)100000.0;
-			exponent += 5;
-		}
-		while (ud >= (double)10.0)
-		{
-			ud /= (double)10.0;
-			++exponent;
-		}
 		if (ud != (double)0.0)
 		{
+			// Using exponent format, so calculate the exponent and normalise ud to be >=1.0 but <10.0
+			// The following loops are inefficient, however we don't expect to print very large or very small numbers
+			while (ud >= (double)100000.0)
+			{
+				ud /= (double)100000.0;
+				exponent += 5;
+			}
+			while (ud >= (double)10.0)
+			{
+				ud /= (double)10.0;
+				++exponent;
+			}
 			while (ud < (double)0.00001)
 			{
 				ud *= (double)100000.0;
@@ -801,11 +801,11 @@ int SafeVsnprintf(char *_ecv_array buffer, size_t maxLen, c_string format, va_li
 	return ret;
 }
 
-int SafeSnprintf(char *_ecv_array buffer, size_t buf_size, c_string format, ...) noexcept
+int SafeSnprintf(char *_ecv_array buffer, size_t maxLen, c_string format, ...) noexcept
 {
 	va_list vargs;
 	va_start(vargs, format);
-	const int ret = SafeVsnprintf(buffer, buf_size, format, vargs);
+	const int ret = SafeVsnprintf(buffer, maxLen, format, vargs);
 	va_end(vargs);
 	return ret;
 }

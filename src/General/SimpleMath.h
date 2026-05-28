@@ -70,6 +70,11 @@ inline constexpr double dsquare(double arg) noexcept
 	return arg * arg;
 }
 
+inline constexpr double dcube(double arg) noexcept
+{
+	return arg * arg * arg;
+}
+
 inline constexpr uint64_t isquare64(int32_t arg) noexcept
 {
 	return (uint64_t)((int64_t)arg * arg);
@@ -158,16 +163,29 @@ extern float fastSqrtf(float f) noexcept;
 
 #endif
 
+#if (defined(SAME70) && SAME70) || defined(__SAME70Q21__)
+
 // Return the real cube root of a float. Twice as fast as calling cbrt() but possibly less accurate.
 float fastCubeRootf(float f) noexcept;
 
-// Solve a cubic equation. We are only interested in real solutions. Returns the number of real solutions. The solutions are stored returned in rslt.
-size_t SolveCubic(float a, float b, float c, float d, float *rslt) noexcept
+inline double fastCubeRootd(double d) noexcept { return cbrt(d); }		//TODO can we make this faster?
+
+// Solve a quadratic equation using double arithmetic. We are only interested in real solutions. Returns the number of real solutions. The solutions are returned in rslt in increasing order.
+size_t SolveQuadratic(double a, double b, double c, double rslt[2]) noexcept
+pre(rslt.lim >= 2)
+post(_ecv_result <= 2);
+
+// Solve a cubic equation. We are only interested in real solutions. Returns the number of real solutions. The solutions are returned in rslt in increasing order.
+size_t SolveCubic(double a, double b, double c, double d, double rslt[3]) noexcept
 pre(rslt.lim >= 3)
 post(_ecv_result <= 3);
 
-// Return the smallest non-negative root of the equation
-float SmallestNonNegativeCubicSolution(float a, float b, float c, float d) noexcept;
+// Solve a quartic equation. We are only interested in real solutions. Returns the number of real solutions. The solutions are returned in rslt in increasing order.
+size_t SolveQuartic(double a, double b, double c, double d, double e, double rslt[4]) noexcept
+pre(rslt.lim >= 4)
+post(_ecv_result <= 4);
+
+#endif
 
 // Macro to give us the number of elements in an array
 #ifndef ARRAY_SIZE
