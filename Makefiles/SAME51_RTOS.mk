@@ -5,7 +5,7 @@ SAME51_RTOS_TARGET := $(SAME51_RTOS_BUILD_DIR)/libRRFLibraries.a
 
 SAME51_RTOS_SRC_DIR := src
 
-SAME51_RTOS_CPP_SRCS := $(shell find $(SAME51_RTOS_SRC_DIR) -name '*.cpp' ! -path '*/RP2040/*')
+SAME51_RTOS_CPP_SRCS := $(filter-out $(SAME51_RTOS_SRC_DIR)/RP2040/%,$(call rwildcard,$(SAME51_RTOS_SRC_DIR),*.cpp))
 
 SAME51_RTOS_INCLUDES := \
 	-I$(SAME51_RTOS_SRC_DIR) \
@@ -36,15 +36,11 @@ SAME51_RTOS_CXXFLAGS := -c -std=c++20 \
 	-fstack-usage \
 	-fdump-rtl-expand \
 	-Wall \
+	-O2 \
 	$(SAME51_RTOS_INCLUDES) \
 	$(SAME51_RTOS_DEFINES)
 
-# Add debug flags if DEBUG=1
-ifeq ($(DEBUG),1)
-SAME51_RTOS_CXXFLAGS += -O0 -g3
-else
-SAME51_RTOS_CXXFLAGS += -O2
-endif
+SAME51_RTOS_CXXFLAGS += $(DEBUG_FLAGS)
 
 SAME51_RTOS_OBJS := $(SAME51_RTOS_CPP_SRCS:%.cpp=$(SAME51_RTOS_BUILD_DIR)/%.o)
 SAME51_RTOS_DEPS := $(SAME51_RTOS_OBJS:.o=.d)

@@ -5,7 +5,7 @@ SAME70_TARGET := $(SAME70_BUILD_DIR)/libRRFLibraries.a
 
 SAME70_SRC_DIR := src
 
-SAME70_CPP_SRCS := $(shell find $(SAME70_SRC_DIR) -name '*.cpp' ! -path '*/RP2040/*')
+SAME70_CPP_SRCS := $(filter-out $(SAME70_SRC_DIR)/RP2040/%,$(call rwildcard,$(SAME70_SRC_DIR),*.cpp))
 
 SAME70_INCLUDES := \
 	-I$(SAME70_SRC_DIR)
@@ -32,15 +32,11 @@ SAME70_CXXFLAGS := -c -std=c++20 \
 	-Wdouble-promotion \
 	-Werror -Wnoexcept -Wshadow -Wsign-promo \
 	-fsingle-precision-constant \
+	-Os \
 	$(SAME70_INCLUDES) \
 	$(SAME70_DEFINES)
 
-# Add debug flags if DEBUG=1
-ifeq ($(DEBUG),1)
-	SAME70_CXXFLAGS += -O0 -g3
-else
-	SAME70_CXXFLAGS += -Os
-endif
+SAME70_CXXFLAGS += $(DEBUG_FLAGS)
 
 SAME70_OBJS := $(SAME70_CPP_SRCS:%.cpp=$(SAME70_BUILD_DIR)/%.o)
 SAME70_DEPS := $(SAME70_OBJS:.o=.d)
